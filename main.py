@@ -1,6 +1,10 @@
 import pandas as pd
-import matplotlib.pyplot as plt
-import numpy as np
+
+"""
+This code prepares the original CSV file 
+(https://corgis-edu.github.io/corgis/csv/tate/) 
+for visualization in Tableau.
+"""
 
 '''Load file into DataFrame'''
 df = pd.read_csv('../tate.csv')
@@ -42,79 +46,24 @@ dfm.to_csv('tate_mediums.csv', index=False)
 # print(dfm.info())
 # print(dfm.head(20))
 
-# '''Create string of mediums'''
-# mediums = ""
-# for row in df.index:
-#     items = df["data.medium"][row]
-#     mediums += items
-#     mediums += ", "
-#
-# '''Split string into array'''
-# mediums = mediums.split(", ")
-#
-# '''Create set of unique mediums'''
-# uniqueMediums = set(mediums)
-#
-# '''Create dictionary of mediums and their counts'''
-# mediumCounts = {'medium':[], 'count':[]}
-#
-# for medium in uniqueMediums:
-#     medium = medium.capitalize()  # Formats medium for readability
-#     count = mediums.count(medium)  # Counts frequency of each medium
-#     mediumCounts['medium'].append(medium)
-#     mediumCounts['count'].append(count)
-#
-# '''Load dictionary into DataFrame'''
-# mc = pd.DataFrame(mediumCounts)
-# mc.sort_values(by='medium', inplace=True)  # Sorts alphabetically for readability
-#
-# '''Add an ID to each row'''
-# mc.insert(0, 'mediumID', 0)  # Creates new column for IDs
-#
-# i = 0
-# for row in mc.index:
-#     mc.loc[row, 'mediumID'] = i
-#     i = i + 1
-#
-# '''Save DataFrame to CSV'''
-# mc.to_csv('tate_mediums.csv', index=False)
-#
-# '''Select top 10 mediums for bar graph'''
-# mc.sort_values(by='count', ascending=False, inplace=True)  # Sorts mediums by count
-# mc = mc.head(10)  # Selects the top 10 mediums
-# mc.sort_values(by='count', ascending=True, inplace=True)  # Sorts mediums in ascending order for plotting
-#
-# '''Create horizontal bar graph with labels'''
-# x = np.array(mc['medium'])
-# y = np.array(mc['count'])
-#
-# bar_container = plt.barh(x, y, color='#1f77b4')
-#
-# plt.title("Top 10 Mediums")
-# plt.xlabel("Pieces")
-#
-# plt.bar_label(bar_container)  # Adds value labels to bars
-#
-# plt.show()
-
-'''Artist's age when Tate acquired piece'''
+'''Artist's age when Tate acquired artwork'''
 def ageAtAcq():
     df["ageAtAcquisition"] = 0  # Creates new column
     for item in df.index:
         if df.loc[item, "artist.death.year"] == 0 \
-                or df.loc[item, "artist.death.year"] >= df.loc[item, "metadata.acquisition date"]:  # Filters out pieces acquired after artist's death
+                or df.loc[item, "artist.death.year"] >= df.loc[item, "metadata.acquisition date"]:  # Filters out artworks acquired after artist's death
             acquisitionYear = df["metadata.acquisition date"][item]
             birthYear = df["artist.birth.year"][item]
             difference = (acquisitionYear - birthYear)
             df.loc[item, "ageAtAcquisition"] = difference
 ageAtAcq()
 
-'''Years after artist's death when Tate acquired piece'''
+'''Years to Tate's post-humous acquisition of artwork'''
 def yearsAfterDeath():
     df["yearsAfterDeath"] = 0  # Creates new column
     for item in df.index:
         if df.loc[item, "artist.death.year"] != 0 \
-                and df.loc[item, "artist.death.year"] < df.loc[item, "metadata.acquisition date"]:  # Filters out living artists and pieces acquired before artist's death
+                and df.loc[item, "artist.death.year"] < df.loc[item, "metadata.acquisition date"]:  # Filters out living artists and artworks acquired before artist's death
             acquisitionYear = df["metadata.acquisition date"][item]
             deathYear = df["artist.death.year"][item]
             difference = (acquisitionYear - deathYear)
